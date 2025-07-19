@@ -9,7 +9,13 @@ export class User {
   email: string;
 
   @Field()
-  fullName: string;
+  firstName: string;
+
+  @Field()
+  lastName: string;
+
+  @Field({ nullable: true })
+  middleName?: string;
 
   @Field({ nullable: true })
   phone?: string;
