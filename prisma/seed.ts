@@ -37,7 +37,8 @@ async function main() {
     update: {},
     create: {
       email: 'tech@example.com',
-      fullName: 'Jane Technician',
+      firstName: 'Jane',
+      lastName: 'Technician',
       phone: '1234567890',
       password: 'hashed-password', // replace with real hash in production
     },
