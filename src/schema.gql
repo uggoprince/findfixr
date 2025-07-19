@@ -1,0 +1,43 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input AuthDTO {
+  email: String!
+  password: String!
+}
+
+input CreateUserInput {
+  email: String!
+  fullName: String!
+  password: String!
+  phone: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type LoginResponse {
+  accessToken: String!
+}
+
+type Mutation {
+  login(credentials: AuthDTO!): LoginResponse!
+  register(input: CreateUserInput!): User!
+}
+
+type Query {
+  getUser(id: String!): User
+  getUsers(filter: String, skip: Int, take: Int): [User!]!
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  fullName: String!
+  id: ID!
+  phone: String
+  updatedAt: DateTime!
+}

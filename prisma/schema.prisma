@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  fullName  String
+  phone     String?
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  technician Technician?
+  bookmarks  Bookmark[]
+  reviews    Review[]
+}
+
+model Technician {
+  id               String      @id @default(uuid())
+  userId           String      @unique
+  businessName     String
+  bio              String?
+  profilePicture   String?
+  yearsExperience  Int?
+  availability     Availability @default(OFFLINE)
+
+  user             User        @relation(fields: [userId], references: [id])
+  services         TechnicianService[]
+  location         TechnicianLocation?
+  media            TechnicianMedia[]
+  reviews          Review[]
+  followers        Bookmark[]
+}
+
+model ServiceCategory {
+  id          Int                  @id @default(autoincrement())
+  name        String               @unique
+  description String?
+
+  technicianServices TechnicianService[]
+}
+
+model TechnicianService {
+  id                String           @id @default(uuid())
+  technicianId      String
+  serviceCategoryId Int
+
+  technician        Technician       @relation(fields: [technicianId], references: [id])
+  serviceCategory   ServiceCategory  @relation(fields: [serviceCategoryId], references: [id])
+}
+
+model TechnicianLocation {
+  technicianId  String   @id
+  lat           Float
+  lng           Float
+  lastUpdatedAt DateTime @default(now())
+
+  technician    Technician @relation(fields: [technicianId], references: [id])
+}
+
+model TechnicianMedia {
+  id            String     @id @default(uuid())
+  technicianId  String
+  mediaUrl      String
+  mediaType     MediaType
+  description   String?
+  uploadedAt    DateTime   @default(now())
+
+  technician    Technician @relation(fields: [technicianId], references: [id])
+}
+
+model Bookmark {
+  id           String     @id @default(uuid())
+  userId       String
+  technicianId String
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id])
+  technician   Technician @relation(fields: [technicianId], references: [id])
+
+  @@unique([userId, technicianId])
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  rating       Int
+  comment      String?
+  createdAt    DateTime   @default(now())
+
+  userId       String?
+  technicianId String
+
+  user         User?      @relation(fields: [userId], references: [id])
+  technician   Technician @relation(fields: [technicianId], references: [id])
+}
+
+enum Availability {
+  ONLINE
+  OFFLINE
+  BUSY
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
