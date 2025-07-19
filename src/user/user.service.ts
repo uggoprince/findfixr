@@ -28,8 +28,9 @@ export class UserService {
       where: filter
         ? {
             OR: [
-              { fullName: { contains: filter, mode: 'insensitive' } },
               { email: { contains: filter, mode: 'insensitive' } },
+              { firstName: { contains: filter, mode: 'insensitive' } },
+              { lastName: { contains: filter, mode: 'insensitive' } },
             ],
           }
         : undefined,

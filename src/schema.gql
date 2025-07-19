@@ -9,7 +9,9 @@ input AuthDTO {
 
 input CreateUserInput {
   email: String!
-  fullName: String!
+  firstName: String!
+  lastName: String!
+  middleName: String!
   password: String!
   phone: String
 }
@@ -36,8 +38,10 @@ type Query {
 type User {
   createdAt: DateTime!
   email: String!
-  fullName: String!
+  firstName: String!
   id: ID!
+  lastName: String!
+  middleName: String
   phone: String
   updatedAt: DateTime!
 }
