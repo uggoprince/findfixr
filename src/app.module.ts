@@ -32,6 +32,35 @@ import databaseConfig from './config/database.config';
       sortSchema: true,
       introspection: process.env.NODE_ENV !== 'production',
       playground: process.env.NODE_ENV !== 'production',
+      formatError: (error) => {
+        // Remove stacktrace completely
+        delete error.extensions?.stacktrace;
+
+        // Clean up the error response
+        const originalError = error.extensions?.originalError as any;
+
+        if (originalError) {
+          return {
+            message: error.message,
+            locations: error.locations,
+            path: error.path,
+            extensions: {
+              code: 'VALIDATION_ERROR',
+              errors: originalError?.errors || originalError?.message,
+              statusCode: originalError?.statusCode || 400,
+            },
+          };
+        }
+
+        return {
+          message: error.message,
+          locations: error.locations,
+          path: error.path,
+          extensions: {
+            code: error.extensions?.code || 'INTERNAL_ERROR',
+          },
+        };
+      },
     }),
     AuthModule,
     UserModule,

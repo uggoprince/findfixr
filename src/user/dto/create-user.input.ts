@@ -11,7 +11,7 @@ import {
 @InputType()
 export class CreateUserInput {
   @Field()
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty()
   email: string;
 
