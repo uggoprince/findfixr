@@ -15,6 +15,9 @@ export function PaginatedType<TItem>(TClass: Type<TItem>) {
 
     @Field(() => Int, { nullable: true })
     nextSkip?: number;
+
+    @Field(() => String, { nullable: true })
+    nextCursor?: string | null;
   }
 
   return PaginatedTypeClass;

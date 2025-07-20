@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
-import { User } from '@prisma/client';
+import { User, Prisma } from '@prisma/client';
+import { PaginatedUsers } from './models/paginated-users.model';
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
     });
   }
 
-  async findAll(filter?: string, skip = 0, take = 10): Promise<User[]> {
+  async findAll(filter?: string, page = 1, pageSize = 10): Promise<User[]> {
     return this.prisma.user.findMany({
       where: filter
         ? {
@@ -34,8 +35,8 @@ export class UserService {
             ],
           }
         : undefined,
-      skip,
-      take,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -52,5 +53,50 @@ export class UserService {
           }
         : undefined,
     });
+  }
+
+  async findAllCursorBased(
+    cursor?: string,
+    take = 10,
+    filter?: string,
+  ): Promise<PaginatedUsers> {
+    const where = filter
+      ? {
+          OR: [
+            { email: { contains: filter, mode: Prisma.QueryMode.insensitive } },
+            {
+              firstName: {
+                contains: filter,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+            {
+              lastName: {
+                contains: filter,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+          ],
+        }
+      : undefined;
+
+    const users = await this.prisma.user.findMany({
+      take: take + 1, // Fetch one extra to check if next page exists
+      skip: cursor ? 1 : 0, // Skip the cursor record if present
+      cursor: cursor ? { id: cursor } : undefined,
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const hasNextPage = users.length > take;
+    const items = hasNextPage ? users.slice(0, take) : users;
+    const nextCursor = hasNextPage ? items[items.length - 1].id : null;
+
+    return {
+      items,
+      totalCount: await this.prisma.user.count({ where }),
+      hasNextPage,
+      nextCursor,
+    };
   }
 }

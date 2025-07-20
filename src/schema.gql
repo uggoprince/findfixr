@@ -37,13 +37,15 @@ type Mutation {
 type PaginatedUsers {
   hasNextPage: Boolean!
   items: [User!]!
+  nextCursor: String
   nextSkip: Int
   totalCount: Int!
 }
 
 type Query {
   getUser(id: String!): User
-  getUsers(filter: String, skip: Int, take: Int): PaginatedUsers!
+  getUsers(filter: String, page: Int, pageSize: Int): PaginatedUsers!
+  getUsersCursor(cursor: String, filter: String, take: Int): PaginatedUsers!
 }
 
 type User {
