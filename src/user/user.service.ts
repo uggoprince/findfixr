@@ -39,4 +39,18 @@ export class UserService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async countAll(filter?: string): Promise<number> {
+    return this.prisma.user.count({
+      where: filter
+        ? {
+            OR: [
+              { email: { contains: filter, mode: 'insensitive' } },
+              { firstName: { contains: filter, mode: 'insensitive' } },
+              { lastName: { contains: filter, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+    });
+  }
 }

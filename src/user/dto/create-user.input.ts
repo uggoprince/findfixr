@@ -25,13 +25,13 @@ export class CreateUserInput {
   @IsNotEmpty()
   lastName: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  middleName: string;
+  middleName: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsPhoneNumber()
-  phone?: string;
+  phone?: string | null;
 
   @Field()
   @IsStrongPassword()

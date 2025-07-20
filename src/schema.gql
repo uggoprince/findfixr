@@ -11,7 +11,7 @@ input CreateUserInput {
   email: String!
   firstName: String!
   lastName: String!
-  middleName: String!
+  middleName: String
   password: String!
   phone: String
 }
@@ -30,9 +30,16 @@ type Mutation {
   register(input: CreateUserInput!): User!
 }
 
+type PaginatedUsers {
+  hasNextPage: Boolean!
+  items: [User!]!
+  nextSkip: Int
+  totalCount: Int!
+}
+
 type Query {
   getUser(id: String!): User
-  getUsers(filter: String, skip: Int, take: Int): [User!]!
+  getUsers(filter: String, skip: Int, take: Int): PaginatedUsers!
 }
 
 type User {

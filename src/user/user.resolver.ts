@@ -2,8 +2,9 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User as GqlUser } from './user.model';
 import { CreateUserInput } from './dto/create-user.input';
-import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '../auth/gql-auth.guard';
+// import { UseGuards } from '@nestjs/common';
+// import { GqlAuthGuard } from '../auth/gql-auth.guard';
+import { PaginatedUsers } from './dto/paginated-users.output';
 
 @Resolver(() => GqlUser)
 export class UserResolver {
@@ -14,14 +15,24 @@ export class UserResolver {
     return this.userService.findById(id);
   }
 
-  @Query(() => [GqlUser])
-  @UseGuards(GqlAuthGuard)
+  @Query(() => PaginatedUsers)
+  // @UseGuards(GqlAuthGuard)
   async getUsers(
     @Args('filter', { nullable: true }) filter: string,
     @Args('skip', { type: () => Int, nullable: true }) skip = 0,
     @Args('take', { type: () => Int, nullable: true }) take = 10,
-  ) {
-    return this.userService.findAll(filter, skip, take);
+  ): Promise<PaginatedUsers> {
+    const [items, totalCount] = await Promise.all([
+      this.userService.findAll(filter, skip, take),
+      this.userService.countAll(filter),
+    ]);
+
+    return {
+      items,
+      totalCount,
+      hasNextPage: skip + take < totalCount,
+      nextSkip: skip + take < totalCount ? skip + take : undefined,
+    };
   }
 
   @Mutation(() => GqlUser)

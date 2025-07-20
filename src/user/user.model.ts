@@ -14,11 +14,11 @@ export class User {
   @Field()
   lastName: string;
 
-  @Field({ nullable: true })
-  middleName?: string;
+  @Field(() => String, { nullable: true })
+  middleName?: string | null;
 
-  @Field({ nullable: true })
-  phone?: string;
+  @Field(() => String, { nullable: true })
+  phone?: string | null;
 
   @Field()
   createdAt: Date;
