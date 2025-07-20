@@ -2,9 +2,9 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User as GqlUser } from './user.model';
 import { CreateUserInput } from './dto/create-user.input';
+import { PaginatedUsers } from './models/paginated-users.model';
 // import { UseGuards } from '@nestjs/common';
 // import { GqlAuthGuard } from '../auth/gql-auth.guard';
-import { PaginatedUsers } from './dto/paginated-users.output';
 
 @Resolver(() => GqlUser)
 export class UserResolver {
