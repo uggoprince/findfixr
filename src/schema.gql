@@ -1,0 +1,111 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input AuthDTO {
+  email: String!
+  password: String!
+}
+
+"""Technician availability status"""
+enum Availability {
+  BUSY
+  OFFLINE
+  ONLINE
+}
+
+input CreateTechnicianInput {
+  availability: Availability
+  bio: String
+  businessName: String
+  latitude: Float
+  longitude: Float
+  profession: String!
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  middleName: String
+  password: String!
+  phone: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type LoginResponse {
+  accessToken: String!
+  email: String!
+  firstName: String!
+  id: String!
+  lastName: String!
+}
+
+type Mutation {
+  createTechnician(input: CreateTechnicianInput!): Technician!
+  login(credentials: AuthDTO!): LoginResponse!
+  register(input: CreateUserInput!): User!
+  updateTechnician(input: UpdateTechnicianInput!): Technician!
+  updateTechnicianLocation(lat: Float!, lng: Float!): Technician!
+}
+
+type PaginatedTechnicians {
+  hasNextPage: Boolean!
+  items: [Technician!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
+}
+
+type PaginatedUsers {
+  hasNextPage: Boolean!
+  items: [User!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
+}
+
+type Query {
+  getUser(id: String!): User
+  getUsers(filter: String, page: Int, pageSize: Int): PaginatedUsers!
+  getUsersCursor(cursor: String, filter: String, take: Int): PaginatedUsers!
+  technician(id: String!): Technician
+  technicians(filter: String, page: Int, pageSize: Int): PaginatedTechnicians!
+}
+
+type Technician {
+  availability: String
+  bio: String
+  businessName: String
+  createdAt: DateTime!
+  id: ID!
+  profession: String!
+  profilePicture: String
+  updatedAt: DateTime!
+  userId: String!
+  yearsExperience: String
+}
+
+input UpdateTechnicianInput {
+  availability: Availability
+  bio: String
+  businessName: String
+  profession: String
+  profilePicture: Availability
+  yearsExperience: Int
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  middleName: String
+  phone: String
+  updatedAt: DateTime!
+}

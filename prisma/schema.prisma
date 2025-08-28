@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+
+  email     String     @unique
+  firstName  String    @map("first_name")
+  lastName   String    @map("last_name")
+  middleName String?   @map("middle_name")
+  phone     String?   @map("phone")
+  password  String    @map("password")
+
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  technician Technician?
+  bookmarks  Bookmark[]
+  reviews    Review[]
+
+  @@map("users")
+}
+
+model Technician {
+  id               String      @id @default(uuid())
+  userId           String      @unique
+  profession       String      @default("General")  // Add temporary default
+  businessName     String? @map("business_name")
+  bio              String?
+  profilePicture   String? @map("profile_picture")
+  yearsExperience  Int?  @map("years_experience")
+  availability     Availability @default(OFFLINE)
+  createdAt        DateTime  @map("created_at")    @default(now())
+  updatedAt        DateTime  @map("updated_at")    @default(now())
+
+  user             User        @relation(fields: [userId], references: [id])
+  services         Service[]
+  location         Location?
+  media            TechnicianMedia[]
+  reviews          Review[]
+  bookmarks        Bookmark[]
+
+  @@map("technicians")
+}
+
+model TechnicianMedia {
+  technicianId  String @map("technician_id")
+  mediaId       String @map("media_id")
+
+  technician    Technician @relation(fields: [technicianId], references: [id])
+  media         Media      @relation(fields: [mediaId], references: [id])
+  
+  @@id([technicianId, mediaId])
+
+  @@map("technician_media")
+  @@index([technicianId], name: "idx_technician_media_technician_id")
+}
+
+model Media {
+  id            String     @id @default(uuid())
+  mediaUrl      String @map("media_url")
+  mediaType     MediaType @map("media_type")
+  description   String?
+  uploadedAt    DateTime @map("uploaded_at")  @default(now())
+  updatedAt     DateTime @map("updated_at")   @updatedAt
+
+  technicians   TechnicianMedia[]
+
+  @@map("media")
+}
+
+model ServiceCategory {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  description String?
+  code        String?              @unique
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  services    Service[]
+
+  @@map("service_categories")
+  @@index([name], name: "idx_service_category_name")
+}
+
+model Service {
+  id                String           @id @default(uuid())
+  name              String
+  price             Float?
+  technicianId      String  @map("technician_id")
+  serviceTypeId     String  @map("service_type_id")
+  serviceCategoryId String  @map("service_category_id")
+  description       String?
+  code              String? @unique
+  status            String    @default("Active") @db.VarChar(50)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  serviceType      ServiceType @relation(fields: [serviceTypeId], references: [id])
+  technician        Technician       @relation(fields: [technicianId], references: [id])
+  serviceCategory   ServiceCategory  @relation(fields: [serviceCategoryId], references: [id])
+
+  @@index([serviceCategoryId])
+  @@index([serviceTypeId])
+  @@index([status])
+
+  @@map("services")
+}
+
+model ServiceType {
+  id          String    @id @default(uuid()) @map("id")
+  name        String    @db.VarChar(100)
+  code        String    @unique @db.VarChar(20)
+  description String?   @db.Text
+  isActive    Boolean   @default(true) @map("is_active")
+  sortOrder   Int?      @map("sort_order")
+  createdDate DateTime  @default(now()) @map("created_date")
+  lastUpdated DateTime  @updatedAt @map("last_updated")
+
+  // Relationship to services
+  services    Service[]
+
+  @@map("service_types")
+}
+
+model Location {
+  technicianId  String   @id
+  lat           Float
+  lng           Float
+  lastUpdatedAt DateTime @default(now())
+
+  technician    Technician @relation(fields: [technicianId], references: [id])
+
+  @@map("locations")
+  @@index([lat, lng], name: "idx_location_lat_lng")
+  @@index([technicianId], name: "idx_location_technician_id")
+}
+
+model Bookmark {
+  id           String     @id @default(uuid())
+  userId       String @map("user_id")
+  technicianId String @map("technician_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  user         User       @relation(fields: [userId], references: [id])
+  technician   Technician @relation(fields: [technicianId], references: [id])
+
+  @@unique([userId, technicianId])
+  @@map("bookmarks")
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  rating       Int
+  comment      String?
+  createdAt    DateTime   @default(now())
+
+  userId       String?
+  technicianId String
+
+  user         User?      @relation(fields: [userId], references: [id])
+  technician   Technician @relation(fields: [technicianId], references: [id])
+
+  @@map("reviews")
+}
+
+enum Availability {
+  ONLINE
+  OFFLINE
+  BUSY
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
