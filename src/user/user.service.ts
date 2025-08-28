@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
@@ -18,6 +18,10 @@ export class UserService {
   }
 
   async create(data: CreateUserInput): Promise<User> {
+    const existing = await this.findByEmail(data.email);
+    if (existing) {
+      throw new ConflictException('Email already in use');
+    }
     const hash = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
       data: { ...data, password: hash },
@@ -55,11 +59,7 @@ export class UserService {
     });
   }
 
-  async findAllCursorBased(
-    cursor?: string,
-    take = 10,
-    filter?: string,
-  ): Promise<PaginatedUsers> {
+  async findAllCursorBased(cursor?: string, take = 10, filter?: string): Promise<PaginatedUsers> {
     const where = filter
       ? {
           OR: [

@@ -8,10 +8,7 @@ export class AuthResolver {
 
   @Mutation(() => LoginResponse)
   async login(@Args('credentials') credentials: AuthDTO) {
-    const user = await this.authService.validateUser(
-      credentials.email,
-      credentials.password,
-    );
+    const user = await this.authService.validateUser(credentials.email, credentials.password);
     return this.authService.login(user);
   }
 }

@@ -7,6 +7,22 @@ input AuthDTO {
   password: String!
 }
 
+"""Technician availability status"""
+enum Availability {
+  BUSY
+  OFFLINE
+  ONLINE
+}
+
+input CreateTechnicianInput {
+  availability: Availability
+  bio: String
+  businessName: String
+  latitude: Float
+  longitude: Float
+  profession: String!
+}
+
 input CreateUserInput {
   email: String!
   firstName: String!
@@ -30,8 +46,19 @@ type LoginResponse {
 }
 
 type Mutation {
+  createTechnician(input: CreateTechnicianInput!): Technician!
   login(credentials: AuthDTO!): LoginResponse!
   register(input: CreateUserInput!): User!
+  updateTechnician(input: UpdateTechnicianInput!): Technician!
+  updateTechnicianLocation(lat: Float!, lng: Float!): Technician!
+}
+
+type PaginatedTechnicians {
+  hasNextPage: Boolean!
+  items: [Technician!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
 }
 
 type PaginatedUsers {
@@ -46,6 +73,30 @@ type Query {
   getUser(id: String!): User
   getUsers(filter: String, page: Int, pageSize: Int): PaginatedUsers!
   getUsersCursor(cursor: String, filter: String, take: Int): PaginatedUsers!
+  technician(id: String!): Technician
+  technicians(filter: String, page: Int, pageSize: Int): PaginatedTechnicians!
+}
+
+type Technician {
+  availability: String
+  bio: String
+  businessName: String
+  createdAt: DateTime!
+  id: ID!
+  profession: String!
+  profilePicture: String
+  updatedAt: DateTime!
+  userId: String!
+  yearsExperience: String
+}
+
+input UpdateTechnicianInput {
+  availability: Availability
+  bio: String
+  businessName: String
+  profession: String
+  profilePicture: Availability
+  yearsExperience: Int
 }
 
 type User {

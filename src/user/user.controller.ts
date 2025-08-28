@@ -1,15 +1,17 @@
-import { Controller, Get, Param, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { User } from '@prisma/client';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { PaginatedUsers } from './models/paginated-users.model';
+import { GqlAuthGuard } from '../auth/gql-auth.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UseGuards(GqlAuthGuard)
   async getUsers(
     @Query('filter') filter?: string,
     @Query('page') page = 1,
@@ -24,12 +26,12 @@ export class UserController {
       items,
       totalCount,
       hasNextPage: page * pageSize < totalCount,
-      nextSkip:
-        page * pageSize < totalCount ? (page + 1) * pageSize : undefined,
+      nextSkip: page * pageSize < totalCount ? (page + 1) * pageSize : undefined,
     };
   }
 
   @Get('cursor')
+  @UseGuards(GqlAuthGuard)
   async getUsersCursor(
     @Query('cursor') cursor?: string,
     @Query('take') take = '10',

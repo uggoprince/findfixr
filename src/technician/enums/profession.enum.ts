@@ -1,0 +1,7 @@
+export enum Profession {
+  PLUMBER = 'PLUMBER',
+  ELECTRICIAN = 'ELECTRICIAN',
+  MECHANIC = 'MECHANIC',
+  CARPENTER = 'CARPENTER',
+  OTHER = 'OTHER',
+}

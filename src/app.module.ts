@@ -4,18 +4,23 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
+import './common/enums/prisma-enums';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-// import { TechnicianModule } from './technician/technician.module';
+import { TechnicianModule } from './technician/technician.module';
 // import { LocationModule } from './location/location.module';
 // import { ServiceCategoryModule } from './service-category/service-category.module';
 // import { MediaModule } from './media/media.module';
 // import { ReviewModule } from './review/review.module';
 // import { BookmarkModule } from './bookmark/bookmark.module';
+import { AppController } from './app.controller';
 
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
+// ✅ Use deep ESM import for the upload scalar
+// import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -25,6 +30,14 @@ import databaseConfig from './config/database.config';
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Use migrations in production
+      ssl: {
+        rejectUnauthorized: false, // For development only
+      },
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -33,10 +46,7 @@ import databaseConfig from './config/database.config';
       introspection: process.env.NODE_ENV !== 'production',
       playground: process.env.NODE_ENV !== 'production',
       formatError: (error) => {
-        // Remove stacktrace completely
         delete error.extensions?.stacktrace;
-
-        // Clean up the error response
         const originalError = error.extensions?.originalError as any;
 
         if (originalError) {
@@ -61,15 +71,19 @@ import databaseConfig from './config/database.config';
           },
         };
       },
+      // Apollo Server v3+ does NOT support uploads option
+      // You must use middleware in your bootstrap (main.ts) file
     }),
     AuthModule,
     UserModule,
-    // TechnicianModule,
+    TechnicianModule,
+    UploadModule,
     // LocationModule,
     // ServiceCategoryModule,
     // MediaModule,
     // ReviewModule,
     // BookmarkModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

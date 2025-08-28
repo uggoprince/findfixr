@@ -39,6 +39,7 @@ export class UserResolver {
   }
 
   @Query(() => PaginatedUsers)
+  @UseGuards(GqlAuthGuard)
   getUsersCursor(
     @Args('cursor', { nullable: true }) cursor?: string, // this is a user ID
     @Args('take', { type: () => Int, nullable: true }) take = 10,
