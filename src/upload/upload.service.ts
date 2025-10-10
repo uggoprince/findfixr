@@ -29,13 +29,15 @@ export class UploadService {
         },
       });
 
-      console.log('🟢 Starting S3 upload with Upload class');
-      await upload.done();
+      console.log('🟢 Starting file upload');
+      const uploadResult = await upload.done();
 
-      const fileUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/technician/${Date.now()}-${filename}`;
-      console.log('🟢 Upload successful:', fileUrl);
+      console.log('🟢 Upload successful:', uploadResult.Location);
 
-      return fileUrl;
+      if (!uploadResult.Location) {
+        throw new BadRequestException('Upload succeeded but no file location was returned.');
+      }
+      return uploadResult.Location;
     } catch (error) {
       console.error('🔴 S3 upload error:', error);
       if (error.name === 'AccessControlListNotSupported') {
