@@ -10,16 +10,15 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TechnicianModule } from './technician/technician.module';
 // import { LocationModule } from './location/location.module';
-// import { ServiceCategoryModule } from './service-category/service-category.module';
+import { ServiceCategoryModule } from './service-category/service-category.module';
 // import { MediaModule } from './media/media.module';
-// import { ReviewModule } from './review/review.module';
-// import { BookmarkModule } from './bookmark/bookmark.module';
+import { ReviewModule } from './review/review.module';
+import { BookmarkModule } from './bookmark/bookmark.module';
 import { AppController } from './app.controller';
 
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 // ✅ Use deep ESM import for the upload scalar
-// import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import { UploadModule } from './upload/upload.module';
 
 @Module({
@@ -79,10 +78,10 @@ import { UploadModule } from './upload/upload.module';
     TechnicianModule,
     UploadModule,
     // LocationModule,
-    // ServiceCategoryModule,
+    ServiceCategoryModule,
     // MediaModule,
-    // ReviewModule,
-    // BookmarkModule,
+    ReviewModule,
+    BookmarkModule,
   ],
   controllers: [AppController],
 })
