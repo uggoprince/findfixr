@@ -4,7 +4,7 @@
 
 ## 🔧 Tech Stack
 - **Backend**: NestJS + GraphQL + TypeORM + PostgreSQL + PostGIS
-- **Frontend**: React + Apollo Client + Map integration
+<!-- - **Frontend**: React + Apollo Client + Map integration -->
 
 ## ✨ Features
 - 🔍 Location-based technician search
@@ -45,8 +45,8 @@ pnpm run start:prod
 
 ### Environment Variables (.env)
 ```env
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/findfixr
-JWT_SECRET=supersecurejwt
+DATABASE_URL=value
+JWT_SECRET=value
 ```
 
 ## 🐳 Docker Setup (optional)
@@ -79,17 +79,3 @@ This project is licensed under the MIT License.
 ---
 
 > Built with ❤️ using NestJS, GraphQL, PostgreSQL, and React.
-
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
