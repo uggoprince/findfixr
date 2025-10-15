@@ -14,6 +14,34 @@ enum Availability {
   ONLINE
 }
 
+type Bookmark {
+  createdAt: DateTime!
+  id: ID!
+  technicianId: String!
+  userId: String!
+}
+
+type BookmarkToggleResponse {
+  bookmark: Bookmark
+  bookmarked: Boolean!
+}
+
+input CreateBookmarkInput {
+  technicianId: String!
+}
+
+input CreateReviewInput {
+  comment: String
+  rating: Int!
+  technicianId: String!
+}
+
+input CreateServiceCategoryInput {
+  description: String
+  icon: String
+  name: String!
+}
+
 input CreateTechnicianInput {
   availability: Availability
   bio: String
@@ -46,11 +74,52 @@ type LoginResponse {
 }
 
 type Mutation {
+  """Add a technician to bookmarks"""
+  createBookmark(input: CreateBookmarkInput!): Bookmark!
+  createReview(input: CreateReviewInput!): Review!
+  createServiceCategory(input: CreateServiceCategoryInput!): ServiceCategory!
   createTechnician(input: CreateTechnicianInput!): Technician!
+
+  """Remove a bookmark by ID"""
+  deleteBookmark(id: String!): Bookmark!
+
+  """Remove a bookmark by technician ID"""
+  deleteBookmarkByTechnician(technicianId: String!): Bookmark!
+  deleteReview(id: String!): Review!
+  deleteServiceCategory(id: String!): ServiceCategory!
   login(credentials: AuthDTO!): LoginResponse!
   register(input: CreateUserInput!): User!
+
+  """Toggle bookmark status for a technician"""
+  toggleBookmark(technicianId: String!): BookmarkToggleResponse!
+  updateReview(id: String!, input: UpdateReviewInput!): Review!
+  updateServiceCategory(id: String!, input: UpdateServiceCategoryInput!): ServiceCategory!
   updateTechnician(input: UpdateTechnicianInput!): Technician!
   updateTechnicianLocation(lat: Float!, lng: Float!): Technician!
+}
+
+type PaginatedBookmarks {
+  hasNextPage: Boolean!
+  items: [Bookmark!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
+}
+
+type PaginatedReviews {
+  hasNextPage: Boolean!
+  items: [Review!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
+}
+
+type PaginatedServiceCategories {
+  hasNextPage: Boolean!
+  items: [ServiceCategory!]!
+  nextCursor: String
+  nextSkip: Int
+  totalCount: Int!
 }
 
 type PaginatedTechnicians {
@@ -70,11 +139,59 @@ type PaginatedUsers {
 }
 
 type Query {
+  averageRating(technicianId: String!): Float!
+
+  """Get a specific bookmark by ID"""
+  bookmark(id: String!): Bookmark
   getUser(id: String!): User
   getUsers(filter: String, page: Int, pageSize: Int): PaginatedUsers!
   getUsersCursor(cursor: String, filter: String, take: Int): PaginatedUsers!
+
+  """Check if a technician is bookmarked by the current user"""
+  isBookmarked(technicianId: String!): Boolean!
+
+  """Get list of all bookmarked technician IDs"""
+  myBookmarkedTechnicianIds: [String!]!
+
+  """Get all bookmarks for the current user"""
+  myBookmarks(page: Int = 1, pageSize: Int = 10): PaginatedBookmarks!
+
+  """Get bookmarks with cursor-based pagination"""
+  myBookmarksCursor(cursor: String, take: Int = 10): PaginatedBookmarks!
+  myReviews(page: Int, pageSize: Int): [Review!]!
+  review(id: String!): Review
+  reviews(filter: String, page: Int, pageSize: Int): PaginatedReviews!
+  reviewsByTechnician(page: Int, pageSize: Int, technicianId: String!): [Review!]!
+  serviceCategories(filter: String, page: Int, pageSize: Int): PaginatedServiceCategories!
+  serviceCategory(id: String!): ServiceCategory
   technician(id: String!): Technician
   technicians(filter: String, page: Int, pageSize: Int): PaginatedTechnicians!
+
+  """Get total number of bookmarks for a technician"""
+  totalBookmarks(technicianId: String!): Int!
+  totalReviews(technicianId: String!): Int!
+
+  """Get users who bookmarked a specific technician"""
+  usersWhoBookmarked(page: Int = 1, pageSize: Int = 10, technicianId: String!): [Bookmark!]!
+}
+
+type Review {
+  comment: String
+  createdAt: DateTime!
+  id: ID!
+  rating: Int!
+  technicianId: String!
+  updatedAt: DateTime!
+  userId: String
+}
+
+type ServiceCategory {
+  createdAt: DateTime!
+  description: String
+  icon: String
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
 }
 
 type Technician {
@@ -88,6 +205,17 @@ type Technician {
   updatedAt: DateTime!
   userId: String!
   yearsExperience: String
+}
+
+input UpdateReviewInput {
+  comment: String
+  rating: Int
+}
+
+input UpdateServiceCategoryInput {
+  description: String
+  icon: String
+  name: String
 }
 
 input UpdateTechnicianInput {

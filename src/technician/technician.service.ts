@@ -255,7 +255,6 @@ export class TechnicianService {
 
     // Upload image to S3
     const imageUrl = await this.uploadService.uploadFile(file);
-    // const imageUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${key}`;
 
     // Get the technician
     const technician = await this.prisma.technician.findUnique({
