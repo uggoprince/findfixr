@@ -59,4 +59,4 @@ RUN ls -la /app && \
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]
