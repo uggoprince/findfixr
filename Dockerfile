@@ -22,7 +22,9 @@ RUN pnpm exec prisma generate
 COPY . .
 
 # Build the application
-RUN pnpm run build
+RUN pnpm run build && \
+    ls -la /app/dist && \
+    echo "Build completed successfully"
 
 # Production stage
 FROM node:20-alpine
@@ -47,8 +49,13 @@ RUN pnpm install --prod --frozen-lockfile && \
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Verify dist folder contents
+RUN ls -la /app && \
+    ls -la /app/dist && \
+    echo "Dist folder copied successfully"
+
 # Expose the application port
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main.js"]
