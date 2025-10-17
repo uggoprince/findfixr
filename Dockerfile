@@ -40,19 +40,15 @@ COPY package.json pnpm-lock.yaml ./
 # Copy prisma schema
 COPY prisma ./prisma
 
-# Install production dependencies, generate Prisma Client, and cleanup
-RUN pnpm install --prod --frozen-lockfile && \
-    pnpm add prisma --save-dev && \
-    pnpm exec prisma generate && \
-    pnpm remove prisma
-
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Verify dist folder contents
-RUN ls -la /app && \
+# Install dependencies, generate Prisma Client, and verify
+RUN pnpm install --frozen-lockfile && \
+    pnpm exec prisma generate && \
+    ls -la /app && \
     ls -la /app/dist && \
-    echo "Dist folder copied successfully"
+    echo "Setup completed successfully"
 
 # Expose the application port
 EXPOSE 3000
