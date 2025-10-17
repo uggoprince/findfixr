@@ -37,17 +37,22 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
+# Install dependencies first
+RUN pnpm install --frozen-lockfile
+
 # Copy prisma schema
 COPY prisma ./prisma
+
+# Generate Prisma Client
+RUN pnpm exec prisma generate
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Install dependencies, generate Prisma Client, and verify
-RUN pnpm install --frozen-lockfile && \
-    pnpm exec prisma generate && \
-    ls -la /app && \
+# Verify setup
+RUN ls -la /app && \
     ls -la /app/dist && \
+    ls -la /app/node_modules/.bin && \
     echo "Setup completed successfully"
 
 # Expose the application port
