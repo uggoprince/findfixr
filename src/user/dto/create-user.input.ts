@@ -28,7 +28,13 @@ export class CreateUserInput {
   phone?: string | null;
 
   @Field()
-  @IsStrongPassword()
+  @IsStrongPassword(
+    {},
+    {
+      message:
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol',
+    },
+  )
   @IsNotEmpty()
   password: string;
 }
