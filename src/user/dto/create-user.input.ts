@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword, Matches } from 'class-validator';
 
 @InputType()
 export class CreateUserInput {
@@ -23,7 +23,8 @@ export class CreateUserInput {
   middleName: string | null;
 
   @Field(() => String, { nullable: true })
-  @IsPhoneNumber()
+  @IsOptional()
+  @Matches(/^\+[1-9]\d{1,14}$/, { message: 'Invalid phone number. Use international format (e.g., +1234567890)' })
   phone?: string | null;
 
   @Field()
