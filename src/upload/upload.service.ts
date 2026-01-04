@@ -13,20 +13,25 @@ interface CloudinaryUploadOptions {
 
 @Injectable()
 export class UploadService {
-  constructor() {
-    this.initializeCloudinary();
-  }
+  private isCloudinaryInitialized = false;
 
   /**
    * Initialize Cloudinary with environment variables
+   * Lazy initialization - only runs when upload methods are called
    */
   private initializeCloudinary(): void {
+    if (this.isCloudinaryInitialized) {
+      return;
+    }
+
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
     if (!cloudName || !apiKey || !apiSecret) {
-      throw new Error('Missing required Cloudinary environment variables');
+      throw new Error(
+        'Missing required Cloudinary environment variables: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET',
+      );
     }
 
     cloudinary.config({
@@ -34,6 +39,8 @@ export class UploadService {
       api_key: apiKey,
       api_secret: apiSecret,
     });
+
+    this.isCloudinaryInitialized = true;
   }
 
   /**
@@ -43,6 +50,8 @@ export class UploadService {
    * @returns Promise<string> - Cloudinary secure URL
    */
   async uploadFile(file: Express.Multer.File, options?: CloudinaryUploadOptions): Promise<string> {
+    this.initializeCloudinary();
+
     if (!file || (!file.buffer && !file.stream)) {
       throw new BadRequestException('Invalid file provided');
     }
@@ -133,6 +142,8 @@ export class UploadService {
    * @returns Promise<boolean> - True if deletion was successful
    */
   async deleteFile(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<boolean> {
+    this.initializeCloudinary();
+
     try {
       const result = await cloudinary.uploader.destroy(publicId, {
         resource_type: resourceType,
@@ -151,6 +162,8 @@ export class UploadService {
    * @returns Promise<any> - Cloudinary resource details
    */
   async getFileDetails(publicId: string): Promise<any> {
+    this.initializeCloudinary();
+
     try {
       return await cloudinary.api.resource(publicId);
     } catch (error) {
