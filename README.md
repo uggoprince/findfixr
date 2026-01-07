@@ -50,7 +50,13 @@ DATABASE_URL=value
 JWT_SECRET=value
 PORT=3000
 API_PREFIX=api
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:3000,http://localhost:3001
 ```
+
+**Important for Production (Render):**
+- Set `NODE_ENV=production`
+- Set `CORS_ORIGIN` to your frontend URL(s), e.g., `https://your-app.com,https://findfixr.onrender.com`
 
 ### API Documentation
 Once the application is running, you can access:

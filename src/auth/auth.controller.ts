@@ -54,10 +54,12 @@ export class AuthController {
    * Helper method to set refresh token cookie
    */
   setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    const isProduction = process.env.NODE_ENV?.toLowerCase() === 'production';
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV?.toLowerCase() === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
@@ -67,10 +69,12 @@ export class AuthController {
    * Helper method to clear refresh token cookie
    */
   clearRefreshTokenCookie(res: Response): void {
+    const isProduction = process.env.NODE_ENV?.toLowerCase() === 'production';
+
     res.cookie('refreshToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV?.toLowerCase() === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       maxAge: 0,
       path: '/',
     });
