@@ -9,6 +9,7 @@ import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -60,6 +61,17 @@ async function bootstrap() {
     const globalPrefix = process.env.API_PREFIX || 'api';
     app.setGlobalPrefix(globalPrefix);
 
+    // Swagger documentation setup
+    const config = new DocumentBuilder()
+      .setTitle('FindFixr API')
+      .setDescription('FindFixr REST API documentation')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addCookieAuth('refreshToken')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+
     app.use(express.json());
 
     // Start server
@@ -70,6 +82,7 @@ async function bootstrap() {
 
     logger.log(`🚀 Application is running on: http://${host}:${port}/${globalPrefix}`);
     logger.log(`📊 GraphQL Playground: http://${host}:${port}/graphql`);
+    logger.log(`📝 Swagger API Docs: http://${host}:${port}/${globalPrefix}/docs`);
     logger.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 
     // Graceful shutdown handlers
