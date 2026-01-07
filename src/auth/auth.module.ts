@@ -6,6 +6,7 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from '../user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -13,13 +14,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' },
+        secret: config.get('app.jwtSecret'),
+        signOptions: { expiresIn: config.get('app.accessTokenExpiration') }, // Short-lived access token
       }),
       inject: [ConfigService],
     }),
     UserModule,
   ],
+  controllers: [AuthController], // Add the REST controller
   providers: [AuthService, AuthResolver, JwtStrategy],
   exports: [AuthService],
 })

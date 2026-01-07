@@ -44,6 +44,7 @@ import { UploadModule } from './upload/upload.module';
       sortSchema: true,
       introspection: process.env.NODE_ENV !== 'production',
       playground: process.env.NODE_ENV !== 'production',
+      context: ({ req, res }) => ({ req, res }),
       formatError: (error) => {
         delete error.extensions?.stacktrace;
         const originalError = error.extensions?.originalError as any;
