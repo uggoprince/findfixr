@@ -1,6 +1,32 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import * as dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
+// Load environment variables
+dotenv.config();
+
+// Parse the DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not defined');
+}
+
+const url = new URL(databaseUrl);
+
+const pool = new Pool({
+  host: url.hostname,
+  port: Number.parseInt(url.port || '5432', 10),
+  database: url.pathname.slice(1), // Remove leading slash
+  user: url.username,
+  password: url.password,
+});
+
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({
+  adapter,
+});
 
 async function main() {
   console.log('🌱 Seeding database...');
@@ -139,6 +165,7 @@ main()
     console.error('❌ Seeding failed:', e);
     process.exit(1);
   })
-  .finally(() => {
-    void prisma.$disconnect();
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end();
   });

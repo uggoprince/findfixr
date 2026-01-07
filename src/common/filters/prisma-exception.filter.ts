@@ -3,6 +3,7 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { GqlArgumentsHost } from '@nestjs/graphql';
 import { Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
+import { sanitize } from '../utils/sanitizer.util';
 
 @Catch(Prisma.PrismaClientKnownRequestError, Prisma.PrismaClientUnknownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
@@ -29,10 +30,10 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       code = 'CONFLICT';
     }
 
-    // Example: log with GraphQL context + query info
+    // Example: log with GraphQL context + query info (sanitized)
     console.error({
       path: info?.fieldName,
-      args,
+      args: sanitize(args),
       user: ctx?.req?.user, // if you attached user in context
       prismaError: exception,
     });

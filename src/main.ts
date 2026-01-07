@@ -6,7 +6,9 @@ import { GraphQLValidationFilter } from './common/filters/graphql-validation.fil
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import helmet from 'helmet';
 import * as express from 'express';
+import * as cookieParser from 'cookie-parser';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -15,6 +17,9 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
       logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
+
+    // Cookie parser - REQUIRED for refresh tokens
+    app.use(cookieParser());
 
     // Security middleware
     app.use(
@@ -48,6 +53,9 @@ async function bootstrap() {
       new PrismaExceptionFilter(),
     );
 
+    // Global logging interceptor with sensitive data masking
+    app.useGlobalInterceptors(new LoggingInterceptor());
+
     // Global prefix for REST APIs (if any)
     const globalPrefix = process.env.API_PREFIX || 'api';
     app.setGlobalPrefix(globalPrefix);
@@ -55,7 +63,7 @@ async function bootstrap() {
     app.use(express.json());
 
     // Start server
-    const port = parseInt(process.env.PORT || '3000', 10);
+    const port = Number.parseInt(process.env.PORT || '3000', 10);
     const host = process.env.HOST || '0.0.0.0';
 
     await app.listen(port);
