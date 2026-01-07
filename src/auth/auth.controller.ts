@@ -62,6 +62,7 @@ export class AuthController {
       sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
+      partitioned: isProduction, // Enable partitioned cookies for cross-site contexts
     });
   }
 
@@ -77,6 +78,7 @@ export class AuthController {
       sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       maxAge: 0,
       path: '/',
+      partitioned: isProduction, // Enable partitioned cookies for cross-site contexts
     });
   }
 }
