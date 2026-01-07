@@ -17,6 +17,7 @@
 ## 📦 Architecture
 - Modular monolith (with microservice-ready modules)
 - GraphQL API for all client interactions
+- REST API with Swagger documentation
 - PostGIS-powered geospatial queries
 - JWT-based authentication
 - Clean, scalable folder structure
@@ -47,7 +48,14 @@ pnpm run start:prod
 ```env
 DATABASE_URL=value
 JWT_SECRET=value
+PORT=3000
+API_PREFIX=api
 ```
+
+### API Documentation
+Once the application is running, you can access:
+- **GraphQL Playground**: `http://localhost:3000/graphql`
+- **REST API Swagger Docs**: `http://localhost:3000/api/docs`
 
 ## 🐳 Docker Setup (optional)
 If you want a Dockerized PostGIS database:

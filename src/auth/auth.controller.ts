@@ -2,7 +2,9 @@ import { Controller, Post, Res, Req, HttpCode, HttpStatus, UnauthorizedException
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { GqlAuthGuard } from './gql-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -13,6 +15,10 @@ export class AuthController {
    */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiCookieAuth('refreshToken')
+  @ApiResponse({ status: 200, description: 'Returns new access token' })
+  @ApiResponse({ status: 401, description: 'Refresh token not found or invalid' })
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refreshToken as string;
 
@@ -35,6 +41,10 @@ export class AuthController {
   @Post('logout')
   @UseGuards(GqlAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Successfully logged out' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   logout(@Res({ passthrough: true }) res: Response) {
     this.clearRefreshTokenCookie(res);
     return { message: 'Logged out successfully' };
